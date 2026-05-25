@@ -172,8 +172,8 @@ export default function ConfigPage() {
               <h1 style={{ fontSize: 20, fontWeight: 900, letterSpacing: "0.05em", lineHeight: 1.2 }}>
                 TIMER<span style={{ color: "var(--accent-rose)" }}>EVENT</span>
               </h1>
-              <p style={{ fontSize: 11, color: "var(--text-muted)", letterSpacing: "0.1em" }}>
-                DESKTOP OVERLAY
+              <p style={{ fontSize: 8, color: "var(--text-muted)", letterSpacing: "0.1em" }}>
+               Skytale DESKTOP OVERLAY (by Genaro)
               </p>
             </div>
           </div>
