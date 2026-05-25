@@ -1,6 +1,6 @@
 {
   "productName": "Skytale TimerBoss Desktop",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "identifier": "com.timerboss.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -65,7 +65,7 @@
       "endpoints": [
         "https://github.com/genarocolusso/timerboss-desktop/releases/latest/download/latest.json"
       ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFEMTRDMEYxMTFDODdENEIKUldSTGZjZ1I4Y0FVcllxdFNLc3pEL2gxck9UaEJNTzhWdVdTMWJLaEZQck1GWDMwUktsMkZJMkMK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNGNDU0Q0NEMzQxNzNEOTcKUldTWFBSYzB6VXhGUHpielRQQ080c3UwV3hUT203Ni9TZlhZbmlCZ3ppUU5UejgyTnFZTTB1UW0K"
     }
   }
 }

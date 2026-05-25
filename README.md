@@ -64,10 +64,10 @@ npm run tauri build
 O sistema de updates já está configurado no projeto e escuta o repositório `genarocolusso/timerboss-desktop`.
 
 ### Como publicar uma nova versão:
-1. Altere a versão em `package.json` e `src-tauri/tauri.conf.json` (ex: `1.0.5`).
+1. Altere a versão em `package.json` e `src-tauri/tauri.conf.json` (ex: `1.0.7`).
 2. Crie uma tag do git correspondente e envie para o GitHub:
    ```bash
-   git tag v1.0.5
+   git tag v1.0.7
    git push origin --tags
    ```
 3. A Action do GitHub compilada em `.github/workflows/publish.yml` compilará o instalador automaticamente, assinará digitalmente os arquivos, criará um release público e atualizará o arquivo `latest.json` de controle do Updater.
