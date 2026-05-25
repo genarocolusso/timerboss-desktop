@@ -40,8 +40,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: v__VERSION__ # tauri-action automatically replaces this with the app version
-          releaseName: 'TimerBoss Desktop v__VERSION__'
-          releaseBody: 'Disponível nova versão do TimerBoss Desktop.'
+          releaseName: 'Skytale TimerBoss Desktop v__VERSION__'
+          releaseBody: 'Disponível nova versão do Skytale TimerBoss Desktop.'
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
