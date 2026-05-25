@@ -1,0 +1,9 @@
+{
+  "identifier": "overlay",
+  "windows": ["overlay"],
+  "permissions": [
+    "core:default",
+    "notification:default",
+    "notification:allow-notify"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "identifier": "default",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "notification:default",
+    "notification:allow-request-permission",
+    "notification:allow-notify",
+    "notification:allow-is-permission-granted",
+    "shell:default",
+    "updater:default"
+  ]
+}
