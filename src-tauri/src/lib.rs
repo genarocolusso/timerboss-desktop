@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, WindowEvent}; // Adicionado WindowEvent aqui
 
 #[tauri::command]
 fn open_overlay(app: tauri::AppHandle) {
@@ -56,6 +56,15 @@ pub fn run() {
             let _ = main_window.set_title("TimerBoss — Configurações");
             Ok(())
         })
+        // --- ADICIONADO: Garante que o app morre quando a main fechar ---
+        .on_window_event(|app, event| {
+            if let WindowEvent::CloseRequested { .. } = event {
+                if app.label() == "main" {
+                    std::process::exit(0);
+                }
+            }
+        })
+        // ----------------------------------------------------------------
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
