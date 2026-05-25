@@ -47,30 +47,7 @@ Certifique-se de ter instalado em sua máquina:
    ```
 
 ---
-
-## 📦 Como Compilar (Build)
-
-Para empacotar a aplicação e gerar o instalador do Windows (`TimerBoss_x64-setup.exe`):
-
-```bash
-npm run tauri build
-```
-*Nota: Certifique-se de que a aplicação em modo desenvolvimento não esteja rodando para evitar erros de bloqueio de escrita de arquivo (`os error 32`).*
-
----
-
-## 🔄 Sistema de Atualizações Automáticas (Auto-Updater)
-
-O sistema de updates já está configurado no projeto e escuta o repositório `genarocolusso/timerboss-desktop`.
-
-### Como publicar uma nova versão:
-1. Altere a versão em `package.json` e `src-tauri/tauri.conf.json` (ex: `1.0.7`).
-2. Crie uma tag do git correspondente e envie para o GitHub:
-   ```bash
-   git tag v1.0.7
-   git push origin --tags
-   ```
-3. A Action do GitHub compilada em `.github/workflows/publish.yml` compilará o instalador automaticamente, assinará digitalmente os arquivos, criará um release público e atualizará o arquivo `latest.json` de controle do Updater.
+ 
 
 ---
 
