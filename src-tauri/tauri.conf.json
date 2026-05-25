@@ -1,6 +1,6 @@
 {
   "productName": "Skytale TimerBoss Desktop",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "identifier": "com.timerboss.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -48,7 +48,9 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": [
+      "nsis"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

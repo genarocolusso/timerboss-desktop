@@ -1,6 +1,8 @@
 {
   "identifier": "default",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "notification:default",
@@ -8,6 +10,10 @@
     "notification:allow-notify",
     "notification:allow-is-permission-granted",
     "shell:default",
-    "updater:default"
+    "updater:allow-check",
+    "updater:allow-download",
+    "updater:allow-install",
+    "dialog:allow-ask",
+    "dialog:allow-message"
   ]
 }
