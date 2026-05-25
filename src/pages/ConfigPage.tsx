@@ -3,6 +3,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { bosses } from "../data/bosses";
 import { useBossStore, AlertMinutes } from "../store/useBossStore";
 import { getNextSpawnTime, formatCountdown } from "../data/bosses";
+import { check } from "@tauri-apps/plugin-updater";
+import { ask, message } from "@tauri-apps/plugin-dialog";
+import { getVersion } from "@tauri-apps/api/app";
 
 // ============================================================
 // ICONS (inline SVG)
@@ -63,6 +66,61 @@ export default function ConfigPage() {
   const [countdown, setCountdown] = useState<Record<string, number>>({});
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState("");
+  const [currentVersion, setCurrentVersion] = useState("1.0.4");
+  const [checkingUpdates, setCheckingUpdates] = useState(false);
+
+  useEffect(() => {
+    if ((window as any).__TAURI__) {
+      getVersion().then(setCurrentVersion).catch(console.error);
+    }
+  }, []);
+
+  const checkUpdates = async () => {
+    if (!(window as any).__TAURI__) {
+      alert("Disponível apenas no aplicativo.");
+      return;
+    }
+    setCheckingUpdates(true);
+    try {
+      const update = await check();
+      if (!update) {
+        await message("Você já está na versão mais recente (v" + currentVersion + ").", {
+          title: "Nenhuma atualização",
+          kind: "info",
+        });
+        return;
+      }
+
+      const shouldUpdate = await ask(
+        `Nova versão ${update.version} disponível!\n\nDeseja baixar e instalar agora?`,
+        {
+          title: "Atualização disponível",
+          kind: "info",
+        }
+      );
+
+      if (!shouldUpdate) return;
+
+      await message(
+        "Baixando atualização...\nO aplicativo irá reiniciar automaticamente.",
+        {
+          title: "Atualizando",
+          kind: "info",
+        }
+      );
+
+      await update.downloadAndInstall();
+      window.location.reload();
+    } catch (err) {
+      console.error("Erro no updater:", err);
+      await message("Erro ao buscar atualizações:\n" + String(err), {
+        title: "Erro",
+        kind: "error",
+      });
+    } finally {
+      setCheckingUpdates(false);
+    }
+  };
 
   // Live countdown ticker (updates each second for preview)
   useEffect(() => {
@@ -172,9 +230,31 @@ export default function ConfigPage() {
               <h1 style={{ fontSize: 20, fontWeight: 900, letterSpacing: "0.05em", lineHeight: 1.2 }}>
                 TIMER<span style={{ color: "var(--accent-rose)" }}>EVENT</span>
               </h1>
-              <p style={{ fontSize: 8, color: "var(--text-muted)", letterSpacing: "0.1em" }}>
-               Skytale DESKTOP OVERLAY (by Genaro)
-              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
+                <p style={{ fontSize: 8, color: "var(--text-muted)", letterSpacing: "0.1em", margin: 0 }}>
+                 Skytale DESKTOP OVERLAY (by Genaro)
+                </p>
+                <span style={{
+                  fontSize: 9, color: "var(--accent-emerald)", fontWeight: 700,
+                  background: "rgba(16,185,129,0.1)", padding: "1px 5px", borderRadius: 4,
+                  border: "1px solid rgba(16,185,129,0.2)", whiteSpace: "nowrap"
+                }}>
+                  v{currentVersion}
+                </span>
+                <button
+                  onClick={checkUpdates}
+                  disabled={checkingUpdates}
+                  style={{
+                    background: "none", border: "none", color: "var(--accent-rose)",
+                    fontSize: 8, fontWeight: 700, textTransform: "uppercase",
+                    letterSpacing: "0.05em", cursor: "pointer", padding: "2px 4px",
+                    textDecoration: "underline", opacity: checkingUpdates ? 0.5 : 1,
+                    outline: "none"
+                  }}
+                >
+                  {checkingUpdates ? "Buscando..." : "Buscar atualizações"}
+                </button>
+              </div>
             </div>
           </div>
 
