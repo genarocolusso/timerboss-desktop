@@ -1,5 +1,15 @@
+# Dependências do Node
 node_modules/
+
+# Frontend (Vite / React / Vue, etc.)
 dist/
 dist-ssr/
 *.local
+
+# Build do Rust / Tauri
 src-tauri/target/
+
+# Arquivos de Variáveis de Ambiente (CHAVES PRIVADAS E SENHAS)
+.env
+.env.local
+.env.*.local
