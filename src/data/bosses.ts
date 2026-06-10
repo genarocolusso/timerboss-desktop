@@ -35,7 +35,7 @@ export const allEvents: BossEvent[] = [
   { time: "16:30", evento: "Babel Iron 1", level: "85+" },
   { time: "17:30", evento: "World Boss Colossus", level: "55+" },
   { time: "17:30", evento: "Fúria Cofre de Ric", level: "85+" },
-  { time: "18:30", evento: "Babel Iron 1", level: "85+" },
+  { time: "18:30", evento: "Babel Iron 2", level: "85+" },
   { time: "19:30", evento: "Valento Ice 1", level: "90+" },
   { time: "20:00", evento: "Hell Gate", level: null },
   { time: "20:30", evento: "Kelvezu", level: "95+" },
@@ -66,7 +66,7 @@ export const bosses: Boss[] = [
     name: "Babel Iron 2",
     img: "/assets/boss/babel.png",
     level: "85+",
-    schedules: ["01:30", "07:30", "22:30"],
+    schedules: ["01:30", "07:30", "18:30", "22:30"],
   },
   {
     id: "furia",
@@ -87,7 +87,7 @@ export const bosses: Boss[] = [
     name: "Babel Iron 1",
     img: "/assets/boss/babel.png",
     level: "80-85+",
-    schedules: ["11:30", "16:30", "18:30", "20:30"],
+    schedules: ["11:30", "16:30", "20:30"],
   },
   {
     id: "mokova",
