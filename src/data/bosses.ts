@@ -82,6 +82,14 @@ export const bosses: Boss[] = [
     level: "95+",
     schedules: ["10:30", "16:30", "20:30", "23:30"],
   },
+  
+  {
+    id: "Skullor",
+    name: "Skullor",
+    img: null,
+    level: "105+",
+    schedules: ["19:30"],
+  },
   {
     id: "babel1",
     name: "Babel Iron 1",
