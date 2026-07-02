@@ -66,7 +66,7 @@ export default function ConfigPage() {
   const [countdown, setCountdown] = useState<Record<string, number>>({});
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState("");
-  const [currentVersion, setCurrentVersion] = useState("1.0.8");
+  const [currentVersion, setCurrentVersion] = useState("1.0.10");
   const [checkingUpdates, setCheckingUpdates] = useState(false);
 
   useEffect(() => {
