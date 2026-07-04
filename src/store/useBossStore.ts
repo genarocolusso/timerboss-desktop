@@ -44,6 +44,10 @@ interface BossStore {
   // TTS volume
   ttsVolume: number;
   setTtsVolume: (v: number) => void;
+
+  // Timezone
+  timezoneOffset: number;
+  setTimezoneOffset: (offset: number) => void;
 }
 
 const DEFAULT_ALERT: BossAlertSettings = {
@@ -107,6 +111,9 @@ export const useBossStore = create<BossStore>()(
 
       ttsVolume: 0.5,
       setTtsVolume: (v) => set({ ttsVolume: v }),
+
+      timezoneOffset: -3,
+      setTimezoneOffset: (offset) => set({ timezoneOffset: offset }),
     }),
     {
       name: "timerboss-desktop-store",

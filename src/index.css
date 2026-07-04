@@ -282,3 +282,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .countdown-warning {
   animation: countdown-warning 2s ease-in-out infinite;
 }
+
+/* Dropdown Options Dark Background styling */
+select option {
+  background-color: #0f0f1e !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}

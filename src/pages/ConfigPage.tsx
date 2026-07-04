@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { bosses } from "../data/bosses";
 import { useBossStore, AlertMinutes } from "../store/useBossStore";
-import { getNextSpawnTime, formatCountdown } from "../data/bosses";
+import { getNextSpawnTimeWithTimezone, convertPtbrToTarget, formatCountdown } from "../data/bosses";
 import { check } from "@tauri-apps/plugin-updater";
 import { ask, message } from "@tauri-apps/plugin-dialog";
 import { getVersion } from "@tauri-apps/api/app";
@@ -60,13 +60,14 @@ export default function ConfigPage() {
     bossAlerts, toggleBossAlert, getBossAlerts,
     globalAlerts, toggleGlobalAlert, setAllGlobalAlerts,
     ttsVolume, setTtsVolume,
+    timezoneOffset, setTimezoneOffset,
   } = useBossStore();
 
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [countdown, setCountdown] = useState<Record<string, number>>({});
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState("");
-  const [currentVersion, setCurrentVersion] = useState("1.0.10");
+  const [currentVersion, setCurrentVersion] = useState("1.0.11");
   const [checkingUpdates, setCheckingUpdates] = useState(false);
 
   useEffect(() => {
@@ -127,14 +128,14 @@ export default function ConfigPage() {
     const tick = () => {
       const next: Record<string, number> = {};
       bosses.forEach((b) => {
-        next[b.id] = getNextSpawnTime(b.schedules).diffSeconds;
+        next[b.id] = getNextSpawnTimeWithTimezone(b.schedules, timezoneOffset).diffSeconds;
       });
       setCountdown(next);
     };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [timezoneOffset]);
 
   // Load TTS voices
   useEffect(() => {
@@ -190,8 +191,8 @@ export default function ConfigPage() {
     : null;
 
   const sortedBosses = [...bosses].sort((a, b) => {
-    const timeA = countdown[a.id] ?? getNextSpawnTime(a.schedules).diffSeconds;
-    const timeB = countdown[b.id] ?? getNextSpawnTime(b.schedules).diffSeconds;
+    const timeA = countdown[a.id] ?? getNextSpawnTimeWithTimezone(a.schedules, timezoneOffset).diffSeconds;
+    const timeB = countdown[b.id] ?? getNextSpawnTimeWithTimezone(b.schedules, timezoneOffset).diffSeconds;
     return timeA - timeB;
   });
 
@@ -291,6 +292,49 @@ export default function ConfigPage() {
         flexShrink: 0,
         flexWrap: "wrap",
       }}>
+        {/* Timezone Select */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            Fuso Horário:
+          </span>
+          <select
+            value={timezoneOffset}
+            onChange={(e) => setTimezoneOffset(Number(e.target.value))}
+            style={{
+              background: "rgba(255,255,255,0.05)", border: "1px solid var(--border-subtle)",
+              borderRadius: 8, color: "var(--text-primary)", fontSize: 11,
+              padding: "4px 8px", outline: "none", cursor: "pointer",
+            }}>
+            <option value={-12}>GMT-12:00</option>
+            <option value={-11}>GMT-11:00</option>
+            <option value={-10}>GMT-10:00</option>
+            <option value={-9}>GMT-09:00</option>
+            <option value={-8}>GMT-08:00</option>
+            <option value={-7}>GMT-07:00</option>
+            <option value={-6}>GMT-06:00</option>
+            <option value={-5}>GMT-05:00</option>
+            <option value={-4}>GMT-04:00</option>
+            <option value={-3}>GMT-03:00 (PT-BR)</option>
+            <option value={-2}>GMT-02:00</option>
+            <option value={-1}>GMT-01:00</option>
+            <option value={0}>GMT+00:00 (UTC)</option>
+            <option value={1}>GMT+01:00 (CET)</option>
+            <option value={2}>GMT+02:00 (EET)</option>
+            <option value={3}>GMT+03:00 (MSK)</option>
+            <option value={4}>GMT+04:00</option>
+            <option value={5}>GMT+05:00</option>
+            <option value={6}>GMT+06:00</option>
+            <option value={7}>GMT+07:00</option>
+            <option value={8}>GMT+08:00 (SGT/CST)</option>
+            <option value={9}>GMT+09:00 (JST)</option>
+            <option value={10}>GMT+10:00 (AEST)</option>
+            <option value={11}>GMT+11:00</option>
+            <option value={12}>GMT+12:00</option>
+            <option value={13}>GMT+13:00</option>
+            <option value={14}>GMT+14:00</option>
+          </select>
+        </div>
+
         {/* Global alert toggles */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
@@ -382,7 +426,7 @@ export default function ConfigPage() {
           {sortedBosses.map((boss, idx) => {
             const isSelected = selectedBosses.includes(boss.id);
             const diff = countdown[boss.id] ?? 0;
-            const spawnInfo = getNextSpawnTime(boss.schedules);
+            const spawnInfo = getNextSpawnTimeWithTimezone(boss.schedules, timezoneOffset);
             const isNext = boss.id === nextSpawnBossId;
 
             // Formatação do tempo restante (ex: "30 min", "1h 30m")
@@ -551,9 +595,10 @@ export default function ConfigPage() {
                     }}>
                       HORÁRIOS DO DIA
                     </span>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                     <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                       {boss.schedules.map((t) => {
-                        const isNextSpawn = t === spawnInfo.time;
+                        const convertedT = convertPtbrToTarget(t, timezoneOffset);
+                        const isNextSpawn = t === spawnInfo.originalTime;
                         return (
                           <span
                             key={t}
@@ -567,7 +612,7 @@ export default function ConfigPage() {
                               color: isNextSpawn ? "#fff" : "rgba(255,255,255,0.6)",
                             }}
                           >
-                            {t}
+                            {convertedT}
                           </span>
                         );
                       })}

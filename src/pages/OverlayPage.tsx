@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { bosses, formatCountdown, parseTimeToMinutes } from "../data/bosses";
+import { bosses, formatCountdown, parseTimeToMinutes, getUTCSpawnTime, convertPtbrToTarget } from "../data/bosses";
 import { useBossStore, AlertMinutes } from "../store/useBossStore";
 
 // ============================================================
@@ -31,6 +31,7 @@ export default function OverlayPage() {
     overlayOpacity,
     setOverlayOpacity,
     ttsVolume,
+    timezoneOffset,
   } = useBossStore();
 
   const [locked, setLocked] = useState(true);
@@ -163,27 +164,35 @@ export default function OverlayPage() {
 
       active.forEach((boss) => {
         boss.schedules.forEach((t) => {
+          const { hour: utcHour, minute: utcMin } = getUTCSpawnTime(t);
           const now = new Date();
+          const year = now.getUTCFullYear();
+          const month = now.getUTCMonth();
+          const date = now.getUTCDate();
 
-          const nowSeconds =
-            now.getHours() * 3600 +
-            now.getMinutes() * 60 +
-            now.getSeconds();
+          const candidates = [
+            new Date(Date.UTC(year, month, date - 1, utcHour, utcMin, 0)),
+            new Date(Date.UTC(year, month, date,     utcHour, utcMin, 0)),
+            new Date(Date.UTC(year, month, date + 1, utcHour, utcMin, 0)),
+          ];
 
-          const evSeconds = parseTimeToMinutes(t) * 60;
+          let bestDiff = Infinity;
+          for (const c of candidates) {
+            const diffSeconds = Math.floor((c.getTime() - now.getTime()) / 1000);
+            if (diffSeconds >= 0 && diffSeconds < bestDiff) {
+              bestDiff = diffSeconds;
+            }
+          }
 
-          const diffSeconds =
-            evSeconds >= nowSeconds
-              ? evSeconds - nowSeconds
-              : 86400 - (nowSeconds - evSeconds);
+          const convertedTime = convertPtbrToTarget(t, timezoneOffset);
 
           updated.push({
             id: `${boss.id}-${t}`,
             bossId: boss.id,
             name: boss.name,
             img: boss.img,
-            nextTime: t,
-            diffSeconds,
+            nextTime: convertedTime,
+            diffSeconds: bestDiff,
           });
         });
       });
@@ -200,7 +209,7 @@ export default function OverlayPage() {
     const id = setInterval(tick, 1000);
 
     return () => clearInterval(id);
-  }, [selectedBosses, checkAlerts]);
+  }, [selectedBosses, checkAlerts, timezoneOffset]);
 
   // ============================================================
   // WINDOW ACTIONS

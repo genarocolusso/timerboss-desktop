@@ -1,6 +1,6 @@
 {
   "productName": "Skytale TimerBoss Desktop",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "identifier": "com.timerboss.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",

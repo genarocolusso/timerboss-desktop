@@ -135,6 +135,55 @@ export function parseTimeToMinutes(t: string): number {
   return h * 60 + m;
 }
 
+export function getUTCSpawnTime(ptbrTime: string): { hour: number; minute: number } {
+  const [h, m] = ptbrTime.split(":").map(Number);
+  // ptbr is UTC-3. So UTC hour = (ptbr hour + 3) % 24.
+  const utcHour = (h + 3) % 24;
+  return { hour: utcHour, minute: m };
+}
+
+export function convertPtbrToTarget(ptbrTime: string, targetOffset: number): string {
+  const { hour, minute } = getUTCSpawnTime(ptbrTime);
+  const targetHour = (hour + targetOffset + 24) % 24;
+  return `${String(targetHour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+export function getNextSpawnTimeWithTimezone(
+  schedules: string[],
+  targetOffset: number
+): { time: string; diffSeconds: number; originalTime: string } {
+  const now = new Date();
+  let best: { time: string; diffSeconds: number; originalTime: string } | null = null;
+
+  for (const t of schedules) {
+    const { hour: utcHour, minute: utcMin } = getUTCSpawnTime(t);
+    const year = now.getUTCFullYear();
+    const month = now.getUTCMonth();
+    const date = now.getUTCDate();
+
+    const candidates = [
+      new Date(Date.UTC(year, month, date - 1, utcHour, utcMin, 0)),
+      new Date(Date.UTC(year, month, date,     utcHour, utcMin, 0)),
+      new Date(Date.UTC(year, month, date + 1, utcHour, utcMin, 0)),
+    ];
+
+    const nowTime = now.getTime();
+
+    for (const c of candidates) {
+      const diffSeconds = Math.floor((c.getTime() - nowTime) / 1000);
+      if (diffSeconds >= 0) {
+        const converted = convertPtbrToTarget(t, targetOffset);
+        if (!best || diffSeconds < best.diffSeconds) {
+          best = { time: converted, diffSeconds, originalTime: t };
+        }
+      }
+    }
+  }
+
+  const fallbackConverted = convertPtbrToTarget(schedules[0], targetOffset);
+  return best ?? { time: fallbackConverted, diffSeconds: 0, originalTime: schedules[0] };
+}
+
 export function getNextSpawnTime(schedules: string[]): { time: string; diffSeconds: number } {
   const now = new Date();
   const nowSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
